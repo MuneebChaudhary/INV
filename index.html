@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="manifest" href="manifest.json">
+    <title>Quotation Generator</title>
+    <style>
+        body { font-family: 'Poppins', sans-serif; margin: 20px; background-color: #f8f9fa; }
+        .container { max-width: 800px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        h2, h3 { text-align: center; color: #444; font-weight: 600; }
+        label { display: block; margin: 10px 0 5px; color: #555; font-weight: 500; }
+        input, textarea { width: 100%; padding: 8px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 4px; font-family: 'Poppins', sans-serif; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+        th { background-color: #f1f1f1; color: #333; }
+        ul { padding-left: 20px; list-style-type: disc; margin-top: 5px; }
+        hr { margin: 15px 0; border: 1px solid #ddd; }
+        button { width: 100%; padding: 10px; margin-top: 10px; border: none; border-radius: 4px; background-color: #28a745; color: white; font-size: 16px; cursor: pointer; }
+        button:hover { background-color: #218838; }
+        .company-details { text-align: center; margin-bottom: 20px; color: #555; }
+        .company-logo { text-align: center; margin-bottom: 10px; }
+        .totals-table { width: 50%; text-align: right; margin-left: auto; margin-top: 20px; }
+        .totals-table th, .totals-table td { text-align: right; background-color: #f9f9f9; }
+        .banking-details { margin-top: 20px; font-size: 16px; color: #444; text-align: center;}
+        .banking-details p { margin: 5px 0; }
+        
+        /* Stylish Heading */
+        .company-logo h2 {
+            color: #5d9bff;
+            font-size: 30px;
+            font-weight: bold;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+
+        .company-details h2, .company-details p {
+            color: #28a745;
+        }
+
+        .company-logo img {
+            margin-bottom: 15px;
+        }
+
+        /* Stylish 'Quotation' Heading */
+        h2 {
+            color: #f39c12; /* A warm golden color */
+            font-size: 32px;
+            text-transform: uppercase;
+            font-weight: 600;
+            margin-top: 20px;
+        }
+
+        .totals-table th, .totals-table td {
+            background-color: #f1f1f1;
+            font-weight: bold;
+        }
+
+        /* Stylish 'Banking Details' Heading */
+        .banking-details h3 {
+            color: #e74c3c; /* Red color */
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        @media (max-width: 600px) {
+            .container { width: 95%; }
+            table, th, td { font-size: 14px; }
+            .totals-table { width: 100%; }
+        }
+
+        /* Print Styles */
+        @media print {
+            body {
+                font-size: 12px;
+            }
+            button {
+                display: none; /* Hide print button in print view */
+            }
+            .container {
+                max-width: 100%;
+                padding: 10px;
+            }
+            .totals-table { 
+                width: 35% !important;  
+            }
+
+            /* Hide unwanted header/footer from print (like URL, Date) */
+            @page {
+                margin: 0;
+            }
+            header, footer {
+                display: none !important;
+            }
+
+            /* Ensure the company details and other parts are visible */
+            .company-details, .company-logo, h2, .totals-table, .banking-details {
+                display: block !important;
+            }
+
+            /* Ensure image displays */
+            .company-logo img {
+                width: 100px;
+                height: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="inputPage">
+        <h2>Quotation Generator</h2>
+        <label>To: <input type="text" id="clientName" required></label>
+        <label>Address: <input type="text" id="clientAddress" required></label>
+        <h3>Work Details</h3>
+        <div id="workEntries"></div>
+        <button onclick="addWorkEntry()">Add Work</button>
+        <button onclick="generateInvoice()" style="background-color: orange">Generate Quotation</button>
+    </div>
+    
+    <div class="container" id="invoicePage" style="display:none;">
+        <div class="company-logo">
+            <!-- Base64 Image for Logo -->
+            <img src="icon.png" alt="Company Logo" width="130">
+            <h2>ADNAN AL KHAIR TECHNICAL SERVICES CO.</h2>
+        </div>
+        <div class="company-details">
+            <p>Office No 1111, at 11th Floor My Tower Al Nahda Dubai UAE</p>
+            <p>Dubai, United Arab Emirates | 00971509230057</p>
+            <p>Email: mianabid348348@gmail.com</p>
+        </div>
+        <hr>
+        <h2>Quotation</h2>
+        <p><strong>To:</strong> <span id="invClientName"></span></p>
+        <p><strong>Address:</strong> <span id="invClientAddress"></span></p>
+        <hr>
+        <table>
+            <tr>
+                <th>Sr No.</th>
+                <th>Work Description</th>
+                <th>Qty / Unit</th>
+                <th>Rate</th>
+                <th>Amount</th>
+            </tr>
+            <tbody id="invoiceTable"></tbody>
+        </table>
+        <table class="totals-table">
+            <tr>
+                <th>Total:</th>
+                <td>AED <span id="total">0.00</span></td>
+            </tr>
+            <tr>
+                <th>(+) VAT: 5.00%:</th>
+                <td>AED <span id="vat">0.00</span></td>
+            </tr>
+            <tr>
+                <th>Grand Total:</th>
+                <td>AED <span id="grandTotal">0.00</span></td>
+            </tr>
+        </table>
+        
+        <hr>
+
+        <p class="amount-words"><b>Amount in Words: </b><span id="amountWords"></span></p>
+        <hr>
+        <div class="banking-details">
+            <h3>Banking Details</h3>
+            <p><strong>ACCOUNT TITLE:</strong> MUHAMMAD ABID</p>
+            <p><strong>Bank Name:</strong> EMIRATES NBD BANK PJSC</p>
+            <p><strong>ACCOUNT NO:</strong> 1015900377001</p>
+            <p><strong>IBAN:</strong> AE710260001015900377001</p>
+        </div>
+        <button onclick="window.print()">Print Quotation</button>
+    </div>
+    
+    <script>
+        let workEntries = [];
+
+        function addWorkEntry() {
+            let div = document.createElement("div");
+            div.innerHTML = `
+                <label>Scope of Work: <input type="text" class="mainWork" required></label>
+                <label>Sub Works (one per line): <textarea class="subWorks" rows="3"></textarea></label>
+                <label>Quantity / Unit: <input type="number" class="qty"></label>
+                <label>Rate: <input type="number" class="rate"></label>
+            `;
+            document.getElementById("workEntries").appendChild(div);
+            workEntries.push(div);
+        }
+
+        function generateInvoice() {
+            document.getElementById("inputPage").style.display = "none";
+            document.getElementById("invoicePage").style.display = "block";
+            document.getElementById("invClientName").innerText = document.getElementById("clientName").value;
+            document.getElementById("invClientAddress").innerText = document.getElementById("clientAddress").value;
+
+            let invoiceTable = document.getElementById("invoiceTable");
+            invoiceTable.innerHTML = "";
+            let total = 0;
+            workEntries.forEach((entry, index) => {
+                let mainWork = entry.querySelector(".mainWork").value;
+                let subWorks = entry.querySelector(".subWorks").value.trim(); // Get the trimmed sub works text
+                let qty = parseFloat(entry.querySelector(".qty").value) || 0;
+                let rate = parseFloat(entry.querySelector(".rate").value) || 0;
+                let amount = qty * rate;
+                total += amount;
+
+                // Conditionally generate the sub-works list
+                let subWorksList = "";
+                if (subWorks) {
+                    subWorksList = `<ul>${subWorks.split("\n").map(item => `<li>${item.trim()}</li>`).join("")}</ul>`;
+                }
+
+                invoiceTable.innerHTML += `
+                    <tr>
+                        <td>${index + 1}</td>
+                        <td>${mainWork}${subWorksList}</td>
+                        <td>${qty}</td>
+                        <td>AED ${rate.toFixed(2)}</td>
+                        <td>AED ${amount.toFixed(2)}</td>
+                    </tr>
+                `;
+            });
+
+            let vat = total * 0.05;
+            let grandTotal = total + vat;
+
+            document.getElementById("total").innerText = total.toFixed(2);
+            document.getElementById("vat").innerText = vat.toFixed(2);
+            document.getElementById("grandTotal").innerText = grandTotal.toFixed(2);
+
+            // Convert amount to words and display
+            document.getElementById("amountWords").innerText = convertNumberToWords(grandTotal);
+        }
+
+        // Convert number to words (for the amount)
+        function convertNumberToWords(amount) {
+            const ones = ["", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine", "Ten", 
+                          "Eleven", "Twelve", "Thirteen", "Fourteen", "Fifteen", "Sixteen", "Seventeen", 
+                          "Eighteen", "Nineteen"];
+            const tens = ["", "", "Twenty", "Thirty", "Forty", "Fifty", "Sixty", "Seventy", "Eighty", "Ninety"];
+            const thousands = ["", "Thousand", "Million", "Billion", "Trillion"];
+
+            function convertHundreds(num) {
+                let result = '';
+                if (num >= 100) {
+                    result += ones[Math.floor(num / 100)] + " Hundred ";
+                    num %= 100;
+                }
+                if (num >= 20) {
+                    result += tens[Math.floor(num / 10)] + " ";
+                    num %= 10;
+                }
+                if (num > 0) {
+                    result += ones[num] + " ";
+                }
+                return result.trim();
+            }
+
+            if (amount === 0) return "Zero AED";
+            
+            let num = Math.floor(amount);
+            let decimal = (amount % 1).toFixed(2).split('.')[1];
+            let word = '';
+            let i = 0;
+
+            while (num > 0) {
+                if (num % 1000 !== 0) {
+                    word = convertHundreds(num % 1000) + " " + thousands[i] + " " + word;
+                }
+                num = Math.floor(num / 1000);
+                i++;
+            }
+
+            let amountInWords = word.trim();
+            if (decimal && decimal > 0) {
+                amountInWords += " and " + convertHundreds(decimal) + " Cents";
+            }
+
+            return amountInWords + " AED";
+        }
+    </script>
+</body>
+</html>

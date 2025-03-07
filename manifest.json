@@ -1,0 +1,14 @@
+{
+  "name": "INV Generator",
+  "short_name": "INV_G",
+  "description": "Developed By Muneeb Chaudahry (+923048444692)",
+  "start_url": "index.html",
+  "display": "standalone",
+  "icons": [
+    {
+      "src": "icon.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+  ]
+}
