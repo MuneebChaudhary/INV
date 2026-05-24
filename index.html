@@ -112,6 +112,7 @@
         <h2>Quotation Generator</h2>
         <label>To: <input type="text" id="clientName" required></label>
         <label>Address: <input type="text" id="clientAddress" required></label>
+        <label>Date: <input type="date" id="clientdate" required></label>
         <h3>Work Details</h3>
         <div id="workEntries"></div>
         <button onclick="addWorkEntry()">Add Work</button>
@@ -131,6 +132,7 @@
         </div>
         <hr>
         <h2>Estimate</h2>
+        <p><strong>Date:</strong> <span id="invdate"></span></p>
         <p><strong>To:</strong> <span id="invClientName"></span></p>
         <p><strong>Address:</strong> <span id="invClientAddress"></span></p>
         <hr>
@@ -193,6 +195,7 @@
             document.getElementById("invoicePage").style.display = "block";
             document.getElementById("invClientName").innerText = document.getElementById("clientName").value;
             document.getElementById("invClientAddress").innerText = document.getElementById("clientAddress").value;
+            document.getElementById("invdate").innerText = document.getElementById("clientdate").value;
 
             let invoiceTable = document.getElementById("invoiceTable");
             invoiceTable.innerHTML = "";
